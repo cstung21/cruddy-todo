@@ -36,7 +36,7 @@ exports.readOne = (id, callback) => {
 
 exports.readAll = (callback) => {
   var results = [];
-  fs.readdir(exports.dataDir, function(err, data) {
+  fs.readdir(exports.dataDir, function (err, data) {
     if (err) {
       callback(err);
     } else {
@@ -49,76 +49,30 @@ exports.readAll = (callback) => {
 };
 
 exports.update = (id, text, callback) => {
-  fs.readdir(exports.dataDir, function(err, filesList) {
+  fs.open(path.join(exports.dataDir, `${id}.txt`), 'r+', function (err, filesList) {
     if (err) {
       callback(err);
     } else {
-      _.each(filesList, (fileName) => {
-      console.log('filesList', filesList, 'filesName', fileName);
-        if (fileName.includes(id)) {
-          fs.writeFile(exports.dataDir + '/' + id + '.txt', text, function(err, data) {
-            if (err) {
-              callback(err);
-            } else {
-              console.log('hi', { id, text: text });
-              callback(null, { id, text: text });
-            }
-          });
+      fs.writeFile(exports.dataDir + '/' + id + '.txt', text, function (err, data) {
+        if (err) {
+          callback(err);
+        } else {
+          callback(null, { id, text: text });
         }
       });
-    }
+    } 
   });
-
-  // var item = items[id];
-  // if (!item) {
-  //   callback(new Error(`No item with id: ${id}`));
-  // } else {
-  //   items[id] = text;
-  //   callback(null, {id: id, text: text});
-  // }
 };
-
-// exports.update = (id, text, callback) => {
-//   fs.readdir(exports.dataDir, function(err, filesList) {
-//     if (err) {
-//       callback(err);
-//     } else {
-//       _.each(filesList, (fileName) => {
-//         // console.log('filesList', filesList, 'filesName', fileName);
-//         if (!fileName.includes(id)) {
-//           callback(er);
-//         } else fs.writeFile(exports.dataDir + '/' + id + '.txt', text, function(err, data) {
-//             if (err) {
-//               callback(err);
-//             } else {
-//               callback(null, { id, text: text });
-//             }
-//           });
-//       }); 
-//     }
-//   }
-//   // var item = items[id];
-//   // if (!item) {
-//   //   callback(new Error(`No item with id: ${id}`));
-//   // } else {
-//   //   items[id] = text;
-//   //   callback(null, {id: id, text: text});
-//   // }
-// };
-
-
-
 
 
 exports.delete = (id, callback) => {
-  var item = items[id];
-  delete items[id];
-  if (!item) {
-    // report an error if item not found
-    callback(new Error(`No item with id: ${id}`));
-  } else {
-    callback();
-  }
+  fs.unlink(path.join(exports.dataDir, `${id}.txt`), function(err) {
+    if (err) {
+      callback(new Error(`No item with id: ${id} `));
+    } else {
+      callback(null);
+    }
+  });
 };
 
 // Config+Initialization code -- DO NOT MODIFY /////////////////////////////////
